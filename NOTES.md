@@ -1,0 +1,3 @@
+Remove the tool_choice line (delete tool_choice: { type: "tool", name: "extract_contact" },). Re-run. Did Claude still call the tool, or did it respond in plain text?  --> No chnage still I got same response
+Delete the phone line from messyText ("she mentioned her mobile is 0412 555 889"). Keep tool_choice in. Re-run. What does the phone field contain in the output? --> No phone field
+Add "phone" to the required array, then keep the phone line deleted. Re-run. Does Claude hallucinate a phone number, return empty, or error? --> "phone": "<UNKNOWN>",
