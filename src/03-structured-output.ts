@@ -21,7 +21,7 @@ const tools: Anthropic.Tool[] = [
         email: { type: "string", description: "Email address, lowercase" },
         phone: {
           type: "string",
-          description: "Phone number in E.164 format, e.g. +61412555889",
+          description: "Phone number in E.164 format, Use empty string if not present in input",
         },
         company: { type: "string" },
         linkedin_url: {
@@ -30,7 +30,7 @@ const tools: Anthropic.Tool[] = [
         },
         location: { type: "string" },
       },
-      required: ["full_name", "email", "company", "phone"],
+      required: ["full_name", "email"],
     },
   },
 ];
