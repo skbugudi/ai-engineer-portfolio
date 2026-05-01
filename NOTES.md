@@ -20,3 +20,8 @@ Observations:
 - Need to verify URLs manually — at least one looks suspicious. No automated way to
   catch hallucinations yet. This is what evals (week 3–4) are for.
 - TODO: harden `click` against multiple matching anchors per row (HN-specific issue).
+## Week 1 — Retrospective
+Mixed models in one loop drift. Sonnet 4.6 in one call and Haiku in the next will give different answers, and neither knows the other is less capable. There's no built-in compatibility layer — going to bite the moment I route across providers.
+The "answered enough" decision is opaque. The model picks its own stopping point based on an inferred guess about how much detail I want — sometimes generous, sometimes truncated. I have no confident tuning lever yet, just hints (system prompt posture, tool descriptions, question framing).
+Schemas are hints, not validators. extract_contact only worked because the messy text was actually pretty clean. On real unstructured input I'd get silent misclassification or <UNKNOWN> sentinels that downstream code can't interpret. The schema is a probabilistic suggestion — downstream code has to assume the contract can be violated.
+The agent's stop boundary is an economics problem. Stop too early → user re-prompts → more cost. Stop too late → turns burned on noise. Right now my only lever is the user's prompt shape; that's not a principled control.
