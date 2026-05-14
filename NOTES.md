@@ -52,11 +52,12 @@ The agent's stop boundary is an economics problem. Stop too early → user re-pr
 
 
 ## Week 2 — Retrospective
+
 Architecture is action-space design. The agent stopped hallucinating not because it was smarter than the chain or router, but because `escalate_to_human` was a legal move — "I don't know" became cheaper than fabricating. Chain and router had no exit; their job was to produce a confident answer, so they did.
 
 Cost curves matter more than absolute cost. Chain and router pay the same input tokens regardless of email difficulty; the agent's input scales with how much it had to investigate. Agent costs more on easy cases and less on impossible ones — that's the right shape for production.
 
-Hallucinations split by architecture, not by model. Same Sonnet 4.6 across all three runs — chain hallucinated where forced confidence met no grounding, router hallucinated on world-knowledge confabulation that prompt instruction couldn't fix. Tools can.
+Hallucinations split by architecture, not by model. Same Sonnet 4.6 across all three runs — chain hallucinated where forced confidence met no grounding; router hallucinated on world-knowledge confabulation that prompt instruction couldn't fix. Tools can.
 
 Tool surface = quality ceiling. The agent escalated on the ambiguous email because its tools didn't cover feature-questions, not because the model couldn't reason. Same lesson as the HN scraper from week 1 — agent quality is bottlenecked by the toolbelt, not by cleverness inside the loop.
 
