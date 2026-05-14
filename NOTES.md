@@ -25,3 +25,39 @@ Mixed models in one loop drift. Sonnet 4.6 in one call and Haiku in the next wil
 The "answered enough" decision is opaque. The model picks its own stopping point based on an inferred guess about how much detail I want — sometimes generous, sometimes truncated. I have no confident tuning lever yet, just hints (system prompt posture, tool descriptions, question framing).
 Schemas are hints, not validators. extract_contact only worked because the messy text was actually pretty clean. On real unstructured input I'd get silent misclassification or <UNKNOWN> sentinels that downstream code can't interpret. The schema is a probabilistic suggestion — downstream code has to assume the contract can be violated.
 The agent's stop boundary is an economics problem. Stop too early → user re-prompts → more cost. Stop too late → turns burned on noise. Right now my only lever is the user's prompt shape; that's not a principled control.
+
+
+## Week 2 Fundamentals and Orchastration
+
+## 01-chain.ts observations
+
+- Billing & technical worked cleanly when the email matched the assumed single-frame shape. System prompt instructions ("never invent amounts/dates") successfully constrained model behaviour.
+- Ambiguous email exposed the chain's structural weakness: classifier picked "other" because the bug report was wrapped in casual prose, and the chain has no way to recover from a misclassification at step 1.
+- Two hallucinations across three runs: technical email fabricated "we pushed a deals content update yesterday"; ambiguous email confidently described a "share icon" that may not exist. Pure-prompt steps without grounding tools will hallucinate plausible-sounding context. Watch for this pattern in arvo audit.
+
+
+## 02-router.ts observations
+
+- Two prompt-level hallucinations from the chain disappeared with explicit "don't invent
+  X" instructions in the topic-specific drafters. Single most useful intervention so far —
+  *if uncertain, say "I'll confirm and follow up"* is a reusable pattern.
+- Multi-label classification + parallel drafters + merger handled the multi-topic email
+  the chain couldn't. Architecture matched input shape; output addressed all three issues.
+- New failure modes from the router: verbosity inflation (over-formatted reply to casual
+  email), aspirational subject lines (claims a "fix" was offered when only diagnostics were),
+  and one residual hallucination about iOS settings (model's world-knowledge confabulation,
+  not product-knowledge — prompt instruction can't fix this; tools can).
+- Cost: router pays ~same as chain on single-topic emails, ~2x on multi-topic. Worth it
+  depends on real input distribution. Senior decision = measure, don't guess.
+
+
+## Week 2 — Retrospective
+Architecture is action-space design. The agent stopped hallucinating not because it was smarter than the chain or router, but because `escalate_to_human` was a legal move — "I don't know" became cheaper than fabricating. Chain and router had no exit; their job was to produce a confident answer, so they did.
+
+Cost curves matter more than absolute cost. Chain and router pay the same input tokens regardless of email difficulty; the agent's input scales with how much it had to investigate. Agent costs more on easy cases and less on impossible ones — that's the right shape for production.
+
+Hallucinations split by architecture, not by model. Same Sonnet 4.6 across all three runs — chain hallucinated where forced confidence met no grounding, router hallucinated on world-knowledge confabulation that prompt instruction couldn't fix. Tools can.
+
+Tool surface = quality ceiling. The agent escalated on the ambiguous email because its tools didn't cover feature-questions, not because the model couldn't reason. Same lesson as the HN scraper from week 1 — agent quality is bottlenecked by the toolbelt, not by cleverness inside the loop.
+
+Architectures that include honest non-answers degrade gracefully; the ones that force a confident answer fail on the long tail. The senior decision isn't "which architecture is most sophisticated" — it's "which action space matches the input distribution".
